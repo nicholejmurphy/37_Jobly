@@ -11,10 +11,10 @@ const { BadRequestError } = require("../expressError");
  * SQL Columns to Update:
  * {jsToSql} = {firstName: 'first_name', lastName: 'last_name'}
  *
- * Checks if there is no data in dataToUpdate. Returns 'BadRequestError' if none.
+ * Throws'BadRequestError' if dataToUpdate is none.
  *
  * Maps dataToUpdate keys w/ query placeholders (`= $1`, `= $2`, `= $3`, etc.)
- * Then joins 'cols' to create a formated query fragment for SET data
+ * Joins 'cols' to create a formated query fragment for SET data
  * >>> setCols = `first_name = $1, last_name = $2`
  *
  * Creates an array of values associated with placeholders in SET data

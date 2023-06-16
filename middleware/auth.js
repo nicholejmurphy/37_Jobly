@@ -48,7 +48,20 @@ function ensureLoggedIn(req, res, next) {
 
 function ensureAdmin(req, res, next) {
   try {
-    console.log("USER PAYLOAD: ", res.locals.user.isAdmin);
+    if (!res.locals.user.isAdmin) throw new UnauthorizedError();
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+/** Middleware to use to ensure logged in user (or admin) can only update current user data.
+ *
+ * If not, raises Unauthorized.
+ */
+
+function ensureCurrUserOrAdmin(req, res, next) {
+  try {
     if (!res.locals.user.isAdmin) throw new UnauthorizedError();
     return next();
   } catch (err) {
@@ -60,4 +73,5 @@ module.exports = {
   authenticateJWT,
   ensureLoggedIn,
   ensureAdmin,
+  ensureCurrUserOrAdmin,
 };

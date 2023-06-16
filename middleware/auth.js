@@ -62,7 +62,9 @@ function ensureAdmin(req, res, next) {
 
 function ensureCurrUserOrAdmin(req, res, next) {
   try {
-    if (!res.locals.user.isAdmin) throw new UnauthorizedError();
+    if (req.params.username === res.locals.user.username) {
+      return next();
+    } else if (!res.locals.user.isAdmin) throw new UnauthorizedError();
     return next();
   } catch (err) {
     return next(err);

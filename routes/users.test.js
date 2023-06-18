@@ -13,6 +13,7 @@ const {
   commonAfterAll,
   u1Token,
   createToken,
+  testJobIds,
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -183,6 +184,7 @@ describe("GET /users/:username", function () {
         lastName: "U1L",
         email: "user1@user.com",
         isAdmin: true,
+        jobs: [testJobIds[0], testJobIds[1]],
       },
     });
   });

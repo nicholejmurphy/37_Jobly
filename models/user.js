@@ -201,7 +201,7 @@ class User {
 
   /** Allows user or admin to apply user for a job
    *
-   * Accepts jobId
+   * Accepts {username, jobId}
    * Returns jobId
    *
    * Returns NotFoundError if jobId or username not found

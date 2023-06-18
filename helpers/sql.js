@@ -38,7 +38,7 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   };
 }
 
-/** Create a WHERE string & VALUES arr for SELECT query data
+/** Creates a WHERE string & VALUES arr for SELECT query data
  *
  * Accepts params that includes {filter: value} pairs to filter companies
  *
@@ -83,4 +83,58 @@ function sqlForCompanyFilter(params) {
   };
 }
 
-module.exports = { sqlForPartialUpdate, sqlForCompanyFilter };
+/** Create a WHERE string & VALUES arr for SELECT query data
+ *
+ * Accepts params that includes {filter: value} pairs to filter jobs
+ *
+ * Creates WHERE statement strings & returns 'BadRequestError' if invalid 'filter' (aka Job column)
+ *
+ * Creates array of values matching filter keys
+ *
+ * Returns {whereCols: <a single where statement>, values: <values arr>}
+ *
+ * */
+function sqlForJobFilter(params) {
+  // Get filters from params' keys
+  const keys = Object.keys(params);
+
+  // Push individual conditional statements to 'whereConditionals'
+  const whereConditionals = [];
+  for (let i = 0; i < keys.length; i++) {
+    if (keys[i] === "title") {
+      whereConditionals.push(`"${keys[i]}" ILIKE $${i + 1}`);
+    } else if (keys[i] === "minSalary") {
+      whereConditionals.push(`"salary" >= $${i + 1}`);
+    } else if (keys[i] === "hasEquity") {
+      if (params[keys[i]]) {
+        whereConditionals.push(`"equity" > $${i + 1}`);
+      }
+    } else throw new BadRequestError(`Invalid filter: ${keys[i]}`);
+  }
+
+  // Map filter values from keys
+  const values = [];
+  for (let k in keys) {
+    if (keys[k] === "title") {
+      values.push(`%${params[keys[k]]}%`);
+    } else if (keys[k] === "minSalary") {
+      values.push(params[keys[k]]);
+    } else if (keys[k] === "hasEquity") {
+      if (params[keys[k]]) {
+        values.push(0);
+      }
+    }
+  }
+
+  // Return WHERE params for SELECT query and associated VALUES
+  return {
+    whereCols: whereConditionals.join(" AND "),
+    values: values,
+  };
+}
+
+module.exports = {
+  sqlForPartialUpdate,
+  sqlForCompanyFilter,
+  sqlForJobFilter,
+};

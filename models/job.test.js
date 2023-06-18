@@ -8,6 +8,7 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
+  testJobIds,
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -140,20 +141,12 @@ describe("filter", function () {
 /************************************** get */
 
 describe("get", function () {
-  const newJob = {
-    title: "new",
-    salary: 100000,
-    equity: 0,
-    companyHandle: "c1",
-  };
-
   test("works", async function () {
-    let job = await Job.create(newJob);
-    let res = await Job.get(job.id);
-    expect(res).toEqual({
-      id: job.id,
-      title: "new",
-      salary: 100000,
+    let job = await Job.get(testJobIds[0]);
+    expect(job).toEqual({
+      id: testJobIds[0],
+      title: "j1",
+      salary: 100001,
       equity: "0",
       companyHandle: "c1",
     });
@@ -180,19 +173,9 @@ describe("update", function () {
   };
 
   test("works", async function () {
-    const res = await db.query(
-      `INSERT INTO jobs
-           (title, salary, equity, company_handle)
-           VALUES ($1, $2, $3, $4)
-           RETURNING id, title, salary, equity, company_handle`,
-      ["testJob", 100000, "0.1", "c1"]
-    );
-
-    const testJob = res.rows[0];
-
-    let job = await Job.update(testJob.id, updateData);
+    let job = await Job.update(testJobIds[0], updateData);
     expect(job).toEqual({
-      id: testJob.id,
+      id: testJobIds[0],
       title: "updated",
       salary: 100000,
       equity: "0",
@@ -202,11 +185,11 @@ describe("update", function () {
     const result = await db.query(
       `SELECT id, title, salary, equity, company_handle
            FROM jobs
-           WHERE id = ${testJob.id}`
+           WHERE id = ${testJobIds[0]}`
     );
     expect(result.rows).toEqual([
       {
-        id: testJob.id,
+        id: testJobIds[0],
         title: "updated",
         salary: 100000,
         equity: "0",
@@ -216,25 +199,16 @@ describe("update", function () {
   });
 
   test("works: null fields", async function () {
-    const res = await db.query(
-      `INSERT INTO jobs
-           (title, salary, equity, company_handle)
-           VALUES ($1, $2, $3, $4)
-           RETURNING id, title, salary, equity, company_handle`,
-      ["testJob", 100000, "0", "c1"]
-    );
-
-    const testJob = res.rows[0];
     const partialUpdateData = {
       title: "updated",
       company_handle: "c1",
     };
 
-    let job = await Job.update(testJob.id, partialUpdateData);
+    let job = await Job.update(testJobIds[0], partialUpdateData);
     expect(job).toEqual({
-      id: testJob.id,
+      id: testJobIds[0],
       title: "updated",
-      salary: 100000,
+      salary: 100001,
       equity: "0",
       companyHandle: "c1",
     });
@@ -242,13 +216,13 @@ describe("update", function () {
     const result = await db.query(
       `SELECT id, title, salary, equity, company_handle
            FROM jobs
-           WHERE id = ${testJob.id}`
+           WHERE id = ${testJobIds[0]}`
     );
     expect(result.rows).toEqual([
       {
-        id: testJob.id,
+        id: testJobIds[0],
         title: "updated",
-        salary: 100000,
+        salary: 100001,
         equity: "0",
         company_handle: "c1",
       },
@@ -266,7 +240,7 @@ describe("update", function () {
 
   test("bad request with no data", async function () {
     try {
-      await Job.update(1, {});
+      await Job.update(testJobIds[0], {});
       fail();
     } catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
@@ -278,16 +252,8 @@ describe("update", function () {
 
 describe("remove", function () {
   test("works", async function () {
-    const jobRes = await db.query(
-      `INSERT INTO jobs
-           (title, salary, equity, company_handle)
-           VALUES ($1, $2, $3, $4)
-           RETURNING id, title, salary, equity, company_handle`,
-      ["testJob", 100000, "0", "c1"]
-    );
-
-    await Job.remove(jobRes.rows[0].id);
-    const res = await db.query("SELECT id FROM jobs WHERE id=1");
+    await Job.remove(testJobIds[0]);
+    const res = await db.query(`SELECT id FROM jobs WHERE id=${testJobIds[0]}`);
     expect(res.rows.length).toEqual(0);
   });
 

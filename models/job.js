@@ -86,6 +86,10 @@ class Job {
    **/
 
   static async get(id) {
+    if (id === NaN) {
+      throw new BadRequestError("Invalid data type: jobId");
+    }
+
     const jobRes = await db.query(
       `SELECT id, 
             title, 

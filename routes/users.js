@@ -15,6 +15,8 @@ const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
 const userNewSchema = require("../schemas/userNew.json");
 const userUpdateSchema = require("../schemas/userUpdate.json");
+const userApplySchema = require("../schemas/userApply.json");
+const Job = require("../models/job");
 
 const router = express.Router();
 
@@ -106,6 +108,42 @@ router.patch(
 
       const user = await User.update(req.params.username, req.body);
       return res.json({ user });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+/** POST /:username/jobs/:jobId { username, jobId }  => { applied: jobId }
+ *
+ * Creates a new application for a user
+ *
+ * This returns the newly created user and an authentication token for them:
+ *  {user: { username, firstName, lastName, email, isAdmin }, token }
+ *
+ * Authorization required: Admin or currUser
+ **/
+router.post(
+  "/:username/jobs/:jobId",
+  ensureCurrUserOrAdmin,
+  async function (req, res, next) {
+    try {
+      const appData = {
+        username: req.params.username,
+        jobId: parseInt(req.params.jobId),
+      };
+
+      const validator = jsonschema.validate(appData, userApplySchema);
+      if (!validator.valid) {
+        const errs = validator.errors.map((e) => e.stack);
+        throw new BadRequestError(errs);
+      }
+      await User.get(appData.username);
+      await Job.get(appData.jobId);
+
+      const result = await User.apply(appData.username, appData.jobId);
+
+      return res.status(201).json(result);
     } catch (err) {
       return next(err);
     }

@@ -215,7 +215,9 @@ describe("update", function () {
 
 describe("apply", function () {
   test("works", async function () {
-    await User.apply("u1", testJobIds[2]);
+    const appRes = await User.apply("u1", testJobIds[2]);
+    expect(appRes).toEqual({ applied: testJobIds[2] });
+
     const res = await db.query(
       `SELECT * FROM applications WHERE username='u1' AND job_id = ${testJobIds[0]}`
     );

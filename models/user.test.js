@@ -141,6 +141,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
+      jobs: [testJobIds[0], testJobIds[1]],
     });
   });
 
@@ -214,11 +215,10 @@ describe("update", function () {
 
 describe("apply", function () {
   test("works", async function () {
-    await User.apply("u1", testJobIds[0]);
+    await User.apply("u1", testJobIds[2]);
     const res = await db.query(
       `SELECT * FROM applications WHERE username='u1' AND job_id = ${testJobIds[0]}`
     );
-    console.log("RESULTS: ", res.rows[0]);
     expect(res.rows[0]).toEqual({
       username: "u1",
       job_id: testJobIds[0],

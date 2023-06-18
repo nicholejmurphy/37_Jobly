@@ -138,7 +138,7 @@ class User {
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
-    const jobRes = db.query(
+    const jobRes = await db.query(
       `
         SELECT job_id 
             FROM applications
@@ -147,7 +147,8 @@ class User {
       [username]
     );
 
-    user.jobs = jobRes.rows;
+    const jobIds = jobRes.rows.map((r) => r.job_id);
+    user.jobs = jobIds;
 
     return user;
   }
@@ -206,7 +207,7 @@ class User {
    * Returns NotFoundError if jobId or username not found
    */
   static async apply(username, jobId) {
-    const res = db.query(
+    const res = await db.query(
       `
       INSERT INTO applications(username, job_id)
       VALUES($1, $2)`,

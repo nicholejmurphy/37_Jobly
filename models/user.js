@@ -138,6 +138,17 @@ class User {
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
+    const jobRes = db.query(
+      `
+        SELECT job_id 
+            FROM applications
+            WHERE username = $1
+            ORDER BY job_id`,
+      [username]
+    );
+
+    user.jobs = jobRes.rows;
+
     return user;
   }
 

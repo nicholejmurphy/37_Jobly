@@ -9,5 +9,8 @@ To run this:
 To run the tests:
 
     jest -i
-.
-------0-*
+
+## Live Code review Questions:
+- Thoughts on middleware ensureCurrUserOrAdmin. Is there a better way to use these?
+- authenticateJWT - purpose of "Bearer" - check into syntax of '/^[Bb]earer /'
+  

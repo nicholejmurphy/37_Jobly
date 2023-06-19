@@ -4,11 +4,7 @@
     "type": "object",
     "default": {},
     "title": "Root Schema",
-    "required": [
-        "title",
-        "salary",
-        "equity"
-    ],
+    "required": [],
     "properties": {
         "title": {
             "type": "string",
@@ -35,6 +31,7 @@
             ]
         }
     },
+    "additionalProperties": false,
     "examples": [{
         "title": "Software Developer",
         "salary": 100000,

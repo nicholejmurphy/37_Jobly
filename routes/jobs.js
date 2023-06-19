@@ -1,6 +1,6 @@
 "use strict";
 
-/** Routes for companies. */
+/** Routes for jobs. */
 
 const jsonschema = require("jsonschema");
 const express = require("express");
@@ -24,6 +24,7 @@ const router = new express.Router();
  */
 
 router.post("/", ensureAdmin, async function (req, res, next) {
+  console.log("INSIDE POST ROUTE /jobs");
   try {
     const validator = jsonschema.validate(req.body, jobNewSchema);
     if (!validator.valid) {
@@ -49,7 +50,7 @@ router.post("/", ensureAdmin, async function (req, res, next) {
  * Authorization required: loggedIn
  */
 
-router.get("/", ensureLoggedIn, async function (req, res, next) {
+router.get("/", async function (req, res, next) {
   try {
     if (Object.keys(req.query).length !== 0) {
       const jobs = await Job.filter(req.query);
@@ -70,7 +71,7 @@ router.get("/", ensureLoggedIn, async function (req, res, next) {
  * Authorization required: loggedIn
  */
 
-router.get("/:id", ensureLoggedIn, async function (req, res, next) {
+router.get("/:id", async function (req, res, next) {
   try {
     const job = await Job.get(req.params.id);
     return res.json({ job });
